@@ -224,6 +224,48 @@
                     </div>
                 </div>
             </div>
+
+            <div class="mt-12 bg-gray-50 border border-gray-200 rounded-2xl p-5 shadow-sm stagger-item stagger-4">
+                <div class="flex justify-between items-center mb-4 border-b border-gray-200 pb-3">
+                    <h3 class="font-bold text-gray-800 flex items-center">
+                        <span class="bg-yellow-300 text-yellow-800 text-xs px-2 py-1 rounded mr-2 font-black">시뮬레이션</span>
+                        카카오톡 공지방 운영 예시 (Live)
+                    </h3>
+                </div>
+
+                <!-- 카카오톡 UI 프레임 -->
+                <div class="max-w-md mx-auto bg-[#b2c7d9] h-[550px] rounded-2xl overflow-hidden shadow-lg border border-gray-300 flex flex-col relative font-sans">
+                    <!-- 헤더 -->
+                    <div class="bg-[#b2c7d9] px-4 py-3 flex items-center justify-between z-10 opacity-90 backdrop-blur-sm sticky top-0">
+                        <div class="flex items-center">
+                            <button class="mr-3 text-gray-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg></button>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-sm flex items-center">땡큐캠핑 B2B 공구 라운지 <span class="bg-gray-400 text-white text-[10px] px-1.5 py-0.5 rounded-full ml-1">253</span></h4>
+                                <p class="text-[#556677] text-xs">최저가 보장 · 상생 라운지</p>
+                            </div>
+                        </div>
+                        <div class="flex space-x-3 text-gray-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        </div>
+                    </div>
+                    
+                    <!-- 채팅 내역 영역 -->
+                    <div id="kakaoChatWindow" class="flex-1 overflow-y-auto p-4 space-y-4 pb-20 scroll-smooth">
+                        <!-- JS로 메시지 삽입됨 -->
+                    </div>
+
+                    <!-- 입력창 영역 (비활성화 상태 연출) -->
+                    <div class="bg-white p-3 flex items-center justify-between border-t border-gray-200 sticky bottom-0">
+                        <div class="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 mr-2">+</div>
+                        <div class="flex-1 bg-gray-100 rounded-full py-2 px-4 text-sm text-gray-400 font-medium">관리자만 메시지를 보낼 수 있습니다.</div>
+                        <div class="w-8 h-8 ml-2 flex items-center justify-center text-yellow-400">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-.464 5.535a1 1 0 10-1.415-1.414 3 3 0 01-4.242 0 1 1 0 00-1.415 1.414 5 5 0 007.072 0z" clip-rule="evenodd"></path></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </section>
 
         <!-- 3. 차별화 전략 -->
@@ -788,6 +830,116 @@
                     }
                 });
             } // renderRevenueChart 함수 종료
+
+            const kakaoChatWindow = document.getElementById('kakaoChatWindow');
+            let kakaoTimeouts = [];
+            let isKakaoPlaying = false; // 재생 상태를 관리하는 변수 추가
+
+            // 캠핑장이 우르르 입장한 뒤 공지가 올라오는 시나리오로 변경
+            const chatSequence = [
+                { time: 300, type: 'system', text: '[양평 별빛캠핑장]님이 들어왔습니다.' },
+                { time: 800, type: 'system', text: '[가평 솔밭캠핑장]님이 들어왔습니다.' },
+                { time: 1300, type: 'system', text: '[제주 바다캠핑]님이 들어왔습니다.' },
+                { time: 1700, type: 'system', text: '[강원 계곡캠핑장]님이 들어왔습니다.' },
+                { time: 2100, type: 'system', text: '[충주 호수캠핑장]님이 들어왔습니다.' },
+                { time: 2400, type: 'system', text: '[포천 캠프파이어]님이 들어왔습니다.' },
+                { time: 2700, type: 'system', text: '[용인 숲속캠핑]님이 들어왔습니다.' },
+                { time: 3000, type: 'system', text: '[남해 선셋캠핑장]님이 들어왔습니다.' },
+                { time: 3300, type: 'system', text: '[태안 바다향기]님이 들어왔습니다.' },
+                { time: 3500, type: 'system', text: '[밀양 오토캠핑장]님이 들어왔습니다.' },
+                { time: 4800, type: 'admin', profile: '🏕️', name: '땡큐캠핑(방장)', 
+                  content: `
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                        <img src="https://i.postimg.cc/yN9QZn3p/search-pstatic.jpg" class="w-full h-32 object-cover" alt="공구 텐트">
+                        <div class="p-3">
+                            <h4 class="font-bold text-gray-800 text-sm mb-1">📢 [금주의 공구] 오비텐 텐트</h4>
+                            <p class="text-xs text-gray-600 mb-2 leading-tight">단순 구매가 아닙니다. <strong>'몸만 오는 이지 캠핑'</strong>으로 사이트를 기획해 보세요!</p>
+                            <ul class="text-[11px] text-gray-700 space-y-1 mb-2 bg-gray-50 p-2 rounded">
+                                <li>✔️ 사이트 단가 상승 (5만 ➔ <span class="text-blue-600 font-bold">7만</span>)</li>
+                                <li>✔️ 3동 도입 시, <span class="text-red-500 font-bold">단 6회 예약</span>으로 텐트 원가 100% 회수 완료!</li>
+                            </ul>
+                            <div class="border-t border-gray-100 pt-2 text-center text-blue-600 font-bold text-xs cursor-pointer bg-blue-50 py-1 rounded">
+                                📊 공구 참여 및 투표하기 &gt;
+                            </div>
+                        </div>
+                    </div>
+                  `
+                }
+            ];
+
+            function renderKakaoChat() {
+                // 기존 타임아웃 초기화
+                kakaoTimeouts.forEach(clearTimeout);
+                kakaoTimeouts = [];
+
+                kakaoChatWindow.style.opacity = '1';
+                kakaoChatWindow.style.transition = 'opacity 0.5s ease-in-out';
+                kakaoChatWindow.innerHTML = ''; // 창 비우기
+
+                let currentTimeStr = new Date().toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit' });
+
+                chatSequence.forEach((msg) => {
+                    const timeoutId = setTimeout(() => {
+                        const msgDiv = document.createElement('div');
+                        msgDiv.classList.add('opacity-0', 'translate-y-4', 'transition-all', 'duration-500', 'ease-out');
+
+                        if (msg.type === 'system') {
+                            msgDiv.className = 'text-center opacity-0 translate-y-4 transition-all duration-500 ease-out';
+                            msgDiv.innerHTML = `<span class="bg-black bg-opacity-20 text-white text-[11px] px-3 py-1 rounded-full inline-block backdrop-blur-sm">${msg.text}</span>`;
+                        } else if (msg.type === 'admin') {
+                            msgDiv.className = 'flex items-start mb-4 opacity-0 translate-y-4 transition-all duration-500 ease-out';
+                            msgDiv.innerHTML = `
+                                <div class="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center text-lg mr-2 shrink-0 border border-yellow-500 shadow-sm z-10">${msg.profile}</div>
+                                <div class="max-w-[75%]">
+                                    <div class="text-xs text-gray-600 mb-1 ml-1 font-medium">${msg.name}</div>
+                                    <div class="flex items-end">
+                                        <div class="text-sm text-gray-800 rounded-2xl rounded-tl-none shadow-sm relative">${msg.content}</div>
+                                        <span class="text-[10px] text-[#556677] ml-2 shrink-0 mb-1">${currentTimeStr}</span>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        
+                        kakaoChatWindow.appendChild(msgDiv);
+                        
+                        // Reflow for transition
+                        void msgDiv.offsetWidth; 
+                        msgDiv.classList.remove('opacity-0', 'translate-y-4');
+                        
+                        // 자동 스크롤
+                        kakaoChatWindow.scrollTo({
+                            top: kakaoChatWindow.scrollHeight,
+                            behavior: 'smooth'
+                        });
+
+                    }, msg.time);
+                    kakaoTimeouts.push(timeoutId);
+                });
+
+                // 무한 루프 설정 (마지막 메시지 4.5초 후 초기화 후 재시작)
+                const finalTimeoutId = setTimeout(() => {
+                    kakaoChatWindow.style.opacity = '0'; // 부드럽게 사라짐
+                    const restartTimeout = setTimeout(() => {
+                        renderKakaoChat(); // 재시작
+                    }, 500); // 사라지는 애니메이션 대기 시간
+                    kakaoTimeouts.push(restartTimeout);
+                }, chatSequence[chatSequence.length - 1].time + 4500);
+                
+                kakaoTimeouts.push(finalTimeoutId);
+            }
+
+            // 카카오톡 컨테이너 화면 진입 시 트리거 (인식률 개선을 위해 threshold 낮춤)
+            const kakaoObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !isKakaoPlaying) {
+                        isKakaoPlaying = true; // 중복 실행 방지
+                        renderKakaoChat();
+                    }
+                });
+            }, { threshold: 0.1 }); // 화면에 10%만 보여도 즉시 실행되도록 수정
+            
+            if(kakaoChatWindow) kakaoObserver.observe(kakaoChatWindow);
+
         });
     </script>
 </body>
